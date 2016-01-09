@@ -16,7 +16,6 @@ console.log("---");
 
 function decode(imageData) {
   var cImageData = [];
-  var prev;
   var getImageData = false;
 
   for (var i = 0; i < imageData.length; i++) {
@@ -25,21 +24,26 @@ function decode(imageData) {
       (i + 1 < imageData.length) ? imageData[i + 1] : null
     ];
 
-    var marker = pairByte[1];
-
     if (!getImageData && soiMarkerFound(pairByte)) {
-      console.log("FOUND SOI: " + marker);
+      console.log("FOUND SOI");
       getImageData = true;
+      continue;
     }
 
     if (getImageData && eoiMarkerFound(pairByte)) {
-      console.log("FOUND EOI: " + marker);
-      getImageData = false;
+      console.log("FOUND EOI");
+      break;
     }
 
     if (getImageData) {
       cImageData.push(marker);
     }
+
+    if (pairByte[0] != 0xff || pairByte[1] == 0xff || pairByte[1] == 0) {
+      continue;
+    }
+
+    var marker = pairByte[1];
   }
 
   console.log(cImageData.length);
